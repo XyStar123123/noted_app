@@ -84,7 +84,7 @@ npm run dev
 ```
 
 ## 📂 Project Structure
-
+```
 noted-app/
 ├── client/                 
 │   ├── src/
@@ -98,6 +98,7 @@ noted-app/
 │   ├── models/             # Mongoose Schemas
 │   ├── middleware/         # Auth Guards
 │   └── routes/             # API Endpoints
+```
 
 ## 🛣️ API Endpoints
 
