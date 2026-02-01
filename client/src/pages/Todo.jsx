@@ -40,7 +40,7 @@ const Todo = () => {
                 onConfirm={handleConfirmDelete}
                 taskTitle={taskToDelete?.title || ""}
             />
-            <div className="max-w-3/4 m-auto p-8">
+            <div className="md:max-w-3/4 m-auto p-8">
 
                 {/* Header Section */}
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-10">

@@ -44,7 +44,7 @@ const Profile = () => {
 
     return (
         <main className="min-h-screen bg-gray-50/50">
-            <div className="max-w-3/4 m-auto p-8">
+            <div className="md:max-w-3/4 m-auto p-8">
                 <div className="mb-10">
                     <h1 className="text-3xl font-bold text-[#181818]">Account Settings</h1>
                     <p className="text-gray-500">Manage your personal information and track your productivity.</p>

@@ -13,7 +13,7 @@ const AppContent = () => {
     const { flash, clearMessage } = useFlash();
 
     return (
-        <div className="bg-gray-100 min-h-screen">
+        <div className="bg-gray-100 min-h-screen pb-24 md:pb-0">
             <FlashMessage
                 message={flash.message}
                 type={flash.type}
