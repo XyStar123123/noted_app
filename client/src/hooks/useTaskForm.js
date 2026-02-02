@@ -1,7 +1,7 @@
-import {useEffect, useState} from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
-import {useFlash} from "../context/FlashContext.jsx";
-import {useNavigate} from "react-router-dom";
+import { useFlash } from "../context/FlashContext.jsx";
+import { useNavigate } from "react-router-dom";
 
 export const useTaskForm = (initialData = null, isEdit = false) => {
     const navigate = useNavigate();
@@ -13,6 +13,13 @@ export const useTaskForm = (initialData = null, isEdit = false) => {
         priority: initialData?.priority || "low"
     });
 
+    const formatDateForInput = (dateString) => {
+        if (!dateString) return "";
+        const date = new Date(dateString);
+        // Returns YYYY-MM-DDTHH:mm
+        return new Date(date.getTime() - date.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
+    };
+
     const { showMessage } = useFlash()
 
     useEffect(() => {
@@ -20,8 +27,7 @@ export const useTaskForm = (initialData = null, isEdit = false) => {
             setFormData({
                 title: initialData.title || "",
                 description: initialData.description || "",
-                // Format the date for the HTML input (YYYY-MM-DD)
-                dueDate: initialData.dueDate ? initialData.dueDate.split('T')[0] : "",
+                dueDate: initialData.dueDate ? formatDateForInput(initialData.dueDate) : "",
                 category: initialData.category || "Personal",
                 priority: initialData.priority || "low"
             });

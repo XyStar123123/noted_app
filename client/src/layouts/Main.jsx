@@ -7,6 +7,7 @@ import Profile from "../pages/Profile.jsx";
 import TodoDetail from "../pages/TodoDetail.jsx";
 import FlashMessage from "../components/FlashMessage.jsx";
 import { FlashProvider, useFlash } from "../context/FlashContext.jsx";
+import History from "../pages/History.jsx";
 
 // We create a sub-component to access the hook
 const AppContent = () => {
@@ -26,6 +27,7 @@ const AppContent = () => {
                 <Route path="/edit-task/:id" element={<TaskForm mode="edit" />} />
                 <Route path="/todo" element={<Todo />} />
                 <Route path="/todo/detail/:id" element={<TodoDetail />} />
+                <Route path="/history" element={<History />} />
                 <Route path="/profile" element={<Profile />} />
             </Routes>
         </div>

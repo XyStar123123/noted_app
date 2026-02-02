@@ -1,4 +1,4 @@
-import { LogOut, PenTool, LayoutDashboard, ListChecks, UserCircle } from "lucide-react";
+import { LogOut, PenTool, LayoutDashboard, ListChecks, History, UserCircle } from "lucide-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useFlash } from "../context/FlashContext.jsx";
 import LogoutModal from "./LogoutModal.jsx";
@@ -21,6 +21,7 @@ const Navbar = () => {
     const navLinks = [
         { name: "Home", href: "/", icon: <LayoutDashboard size={20} /> },
         { name: "Todo", href: "/todo", icon: <ListChecks size={20} /> },
+        { name: "History", href: "/history", icon: <History size={20} /> },
         { name: "Profile", href: "/profile", icon: <UserCircle size={20} /> },
     ];
 
@@ -35,7 +36,7 @@ const Navbar = () => {
             {/* --- TOP NAVBAR (Logo & Logout only on Desktop) --- */}
             <div className="bg-white/80 backdrop-blur-md sticky top-0 z-50 border-b border-gray-100">
                 <header className="lg:max-w-3/4 m-auto py-4 px-5 flex items-center justify-between">
-                    
+
                     {/* Brand / Logo */}
                     <Link to="/" className="flex items-center gap-2 text-[#181818] group cursor-pointer">
                         <div className="bg-[#181818] p-1.5 rounded-lg group-hover:rotate-[-10deg] transition-transform duration-200">
@@ -52,11 +53,10 @@ const Navbar = () => {
                                 <Link
                                     key={link.name}
                                     to={link.href}
-                                    className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold transition-all duration-200 ${
-                                        isActive
-                                            ? "bg-white text-[#181818] shadow-sm ring-1 ring-black/5"
-                                            : "text-gray-500 hover:text-[#181818] hover:bg-white/50"
-                                    }`}
+                                    className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold transition-all duration-200 ${isActive
+                                        ? "bg-white text-[#181818] shadow-sm ring-1 ring-black/5"
+                                        : "text-gray-500 hover:text-[#181818] hover:bg-white/50"
+                                        }`}
                                 >
                                     {link.icon}
                                     {link.name}
@@ -84,9 +84,8 @@ const Navbar = () => {
                         <Link
                             key={link.name}
                             to={link.href}
-                            className={`flex flex-col items-center gap-1 transition-all duration-200 ${
-                                isActive ? "text-[#181818]" : "text-gray-400"
-                            }`}
+                            className={`flex flex-col items-center gap-1 transition-all duration-200 ${isActive ? "text-[#181818]" : "text-gray-400"
+                                }`}
                         >
                             <div className={`p-2 rounded-xl transition-all ${isActive ? "bg-gray-100" : ""}`}>
                                 {link.icon}

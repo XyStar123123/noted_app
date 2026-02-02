@@ -1,4 +1,4 @@
-import { Plus, CheckCircle2, Circle, Clock, ChevronRight, BarChart3 } from "lucide-react";
+import { Plus, CheckCircle2, Circle, Clock, ChevronRight, BarChart3, Lock } from "lucide-react";
 import { useTasks } from "../hooks/useTask.js";
 import { useProfile } from "../hooks/useAuth.js";
 import { Link } from "react-router-dom";
@@ -7,12 +7,25 @@ const Home = () => {
     const { tasks, loading } = useTasks();
     const { user } = useProfile();
 
-    // 1. Calculate Real-time Stats
-    const totalTasks = tasks.length;
-    const completedTasks = tasks.filter(t => t.status === 'completed').length;
-    const completionRate = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
+    // 1. Logic to determine if a task is locked (Matching Todo.jsx)
+    const isTaskLocked = (task) => {
+        return task.status !== 'completed' &&
+            new Date() > new Date(new Date(task.dueDate).getTime() + 60 * 60 * 1000);
+    };
 
-    // Get the 3 most recent tasks
+    // 2. Separate tasks for more accurate stats
+    const completedTasksList = tasks.filter(t => t.status === 'completed');
+    const lockedTasksList = tasks.filter(t => isTaskLocked(t));
+    const activePendingTasks = tasks.filter(t => t.status !== 'completed' && !isTaskLocked(t));
+
+    const totalTasks = tasks.length;
+    const completedCount = completedTasksList.length;
+    const lockedCount = lockedTasksList.length;
+
+    // Completion rate based on total tasks
+    const completionRate = totalTasks > 0 ? Math.round((completedCount / totalTasks) * 100) : 0;
+
+    // Get the 3 most recent tasks (showing active ones first is usually better for UX)
     const recentTasks = [...tasks].reverse().slice(0, 3);
 
     // SVG Circular Progress math
@@ -35,7 +48,8 @@ const Home = () => {
                             {user ? `Hey, ${user.username}! 👋` : "Today's Progress"}
                         </h1>
                         <p className="text-gray-400 text-lg max-w-md">
-                            You've completed <span className="text-white font-bold">{completionRate}%</span> of your total tasks. {completionRate === 100 ? "Amazing job!" : "Keep the momentum going!"}
+                            You've completed <span className="text-white font-bold">{completionRate}%</span> of your tasks.
+                            {lockedCount > 0 && <span className="text-red-400 ml-1">({lockedCount} expired)</span>}
                         </p>
                         <div className="mt-6 flex flex-col md:flex-row gap-3">
                             <Link to="/add-task" className="bg-white text-black px-6 py-3 rounded-xl font-bold flex items-center gap-2 hover:bg-gray-200 transition-all justify-center">
@@ -43,7 +57,7 @@ const Home = () => {
                                 Add Task
                             </Link>
                             <Link to="/todo" className="bg-[#2A2A2A] text-white border border-white/10 px-6 py-3 rounded-xl font-bold hover:bg-[#3A3A3A] transition-all text-center">
-                                View Analytics
+                                Open Todo List
                             </Link>
                         </div>
                     </div>
@@ -57,7 +71,7 @@ const Home = () => {
                                 stroke="currentColor" strokeWidth="12" fill="transparent"
                                 strokeDasharray={circumference}
                                 style={{ strokeDashoffset: offset, transition: 'stroke-dashoffset 1s ease-in-out' }}
-                                className="text-white"
+                                className={completionRate === 100 ? "text-green-400" : "text-white"}
                             />
                         </svg>
                         <span className="absolute text-2xl font-black">{completionRate}%</span>
@@ -76,26 +90,31 @@ const Home = () => {
 
                         <div className="space-y-4">
                             {recentTasks.length > 0 ? (
-                                recentTasks.map((task) => (
-                                    <div key={task._id} className="bg-white p-5 rounded-xl border border-gray-100 shadow-sm flex items-center justify-between group hover:border-black/10 transition-all">
-                                        <div className="flex items-center gap-4">
-                                            {task.status === "completed" ? (
-                                                <CheckCircle2 className="text-green-500 w-6 h-6" />
-                                            ) : (
-                                                <Circle className="text-gray-300 w-6 h-6" />
-                                            )}
-                                            <div>
-                                                <h3 className={`font-bold ${task.status === "completed" ? 'line-through text-gray-400' : 'text-[#181818]'}`}>
-                                                    {task.title}
-                                                </h3>
-                                                <span className="text-xs font-medium text-gray-400 uppercase tracking-wider">{task.category || 'General'}</span>
+                                recentTasks.map((task) => {
+                                    const locked = isTaskLocked(task);
+                                    return (
+                                        <div key={task._id} className={`bg-white p-5 rounded-xl border flex items-center justify-between group transition-all ${locked ? 'border-red-50 bg-gray-50/30' : 'border-gray-100 shadow-sm hover:border-black/10'}`}>
+                                            <div className="flex items-center gap-4">
+                                                {locked ? (
+                                                    <Lock className="text-red-400 w-6 h-6" />
+                                                ) : task.status === "completed" ? (
+                                                    <CheckCircle2 className="text-green-500 w-6 h-6" />
+                                                ) : (
+                                                    <Circle className="text-gray-300 w-6 h-6" />
+                                                )}
+                                                <div>
+                                                    <h3 className={`font-bold ${task.status === "completed" ? 'line-through text-gray-400' : 'text-[#181818]'}`}>
+                                                        {task.title} {locked && <span className="text-[10px] text-red-500 ml-1">[LOCKED]</span>}
+                                                    </h3>
+                                                    <span className="text-xs font-medium text-gray-400 uppercase tracking-wider">{task.category || 'General'}</span>
+                                                </div>
                                             </div>
+                                            <Link to={locked ? "/todo" : `/todo/detail/${task._id}`} className="opacity-0 group-hover:opacity-100 p-2 hover:bg-gray-100 rounded-lg transition-all">
+                                                <ChevronRight className="w-4 h-4 text-gray-400" />
+                                            </Link>
                                         </div>
-                                        <Link to={`/todo/detail/${task._id}`} className="opacity-0 group-hover:opacity-100 p-2 hover:bg-gray-100 rounded-lg transition-all">
-                                            <ChevronRight className="w-4 h-4 text-gray-400" />
-                                        </Link>
-                                    </div>
-                                ))
+                                    )
+                                })
                             ) : (
                                 <div className="text-center py-10 bg-white rounded-xl border border-dashed border-gray-200 text-gray-400">
                                     No tasks yet. Start by adding one!
@@ -113,8 +132,8 @@ const Home = () => {
                             <div className="space-y-4">
                                 <div>
                                     <div className="flex justify-between text-sm mb-1">
-                                        <span className="text-gray-500">Task Completion</span>
-                                        <span className="font-bold">{completedTasks}/{totalTasks}</span>
+                                        <span className="text-gray-500">Progress</span>
+                                        <span className="font-bold">{completedCount}/{totalTasks}</span>
                                     </div>
                                     <div className="w-full bg-gray-100 h-2 rounded-full overflow-hidden">
                                         <div
@@ -125,12 +144,12 @@ const Home = () => {
                                 </div>
                                 <div className="grid grid-cols-2 gap-4 pt-2">
                                     <div className="bg-gray-50 p-3 rounded-lg text-center">
-                                        <p className="text-xs text-gray-500 uppercase">Pending</p>
-                                        <p className="text-xl font-bold">{totalTasks - completedTasks}</p>
+                                        <p className="text-xs text-gray-500 uppercase">Active</p>
+                                        <p className="text-xl font-bold text-blue-600">{activePendingTasks.length}</p>
                                     </div>
                                     <div className="bg-gray-50 p-3 rounded-lg text-center">
-                                        <p className="text-xs text-gray-500 uppercase">Success</p>
-                                        <p className="text-xl font-bold">{completedTasks}</p>
+                                        <p className="text-xs text-gray-500 uppercase">Expired</p>
+                                        <p className="text-xl font-bold text-red-500">{lockedCount}</p>
                                     </div>
                                 </div>
                             </div>
@@ -141,7 +160,9 @@ const Home = () => {
                                 <Clock className="text-gray-400" size={20} />
                                 <h3 className="font-bold text-lg">Focus Mode</h3>
                             </div>
-                            <p className="text-sm text-gray-300 mb-4">You have {totalTasks - completedTasks} tasks remaining for today.</p>
+                            <p className="text-sm text-gray-300 mb-4">
+                                You have <span className="text-white font-bold">{activePendingTasks.length}</span> actionable tasks remaining.
+                            </p>
                             <Link to="/todo" className="block w-full text-center py-2 bg-white/10 hover:bg-white/20 rounded-lg text-sm font-semibold transition-all">
                                 Open Todo List
                             </Link>

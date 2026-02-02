@@ -1,11 +1,11 @@
-import {useEffect, useState} from "react";
-import {ArrowLeft, Calendar, Tag, Flag, CheckCircle2, Save} from "lucide-react";
+import { useEffect, useState } from "react";
+import { ArrowLeft, Calendar, Tag, Flag, CheckCircle2, Save } from "lucide-react";
 import axios from "axios";
-import {useTaskForm} from "../hooks/useTaskForm.js";
-import {useParams} from "react-router-dom";
+import { useTaskForm } from "../hooks/useTaskForm.js";
+import { useParams } from "react-router-dom";
 
 // I renamed this to TaskForm so it feels consistent for both roles
-const TaskForm = ({mode = "add", existingData: initialData = null}) => {
+const TaskForm = ({ mode = "add", existingData: initialData = null }) => {
     const { id } = useParams();
     const isEdit = mode === "edit";
     const token = localStorage.getItem("noted_token");
@@ -39,8 +39,8 @@ const TaskForm = ({mode = "add", existingData: initialData = null}) => {
                 {/* Header Section */}
                 <div className="flex items-center gap-4 mb-8">
                     <a href="/"
-                       className="p-2 hover:bg-white rounded-full transition-all border border-transparent hover:border-gray-200">
-                        <ArrowLeft className="w-6 h-6 text-[#2A2A2A]"/>
+                        className="p-2 hover:bg-white rounded-full transition-all border border-transparent hover:border-gray-200">
+                        <ArrowLeft className="w-6 h-6 text-[#2A2A2A]" />
                     </a>
                     <div>
                         <h1 className="text-3xl font-bold text-[#181818]">
@@ -88,16 +88,17 @@ const TaskForm = ({mode = "add", existingData: initialData = null}) => {
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     {/* Due Date */}
                                     <div>
-                                        <label
-                                            className="block text-sm font-bold text-[#2A2A2A] mb-2 uppercase tracking-wide flex items-center gap-2">
-                                            <Calendar size={14}/> Due Date
+                                        <label className="block text-sm font-bold text-[#2A2A2A] mb-2 uppercase tracking-wide flex items-center gap-2">
+                                            <Calendar size={14} /> {isEdit ? "Estimated Time (Locked)" : "Set Estimated Finish Time"}
                                         </label>
                                         <input
                                             name="dueDate"
                                             value={formData.dueDate}
                                             onChange={handleChange}
-                                            type="date"
-                                            className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-black outline-none transition-all"
+                                            type="datetime-local" // Change from 'date' to 'datetime-local'
+                                            disabled={isEdit}      // DISABLE when in edit mode
+                                            className={`w-full px-4 py-3 rounded-xl border outline-none transition-all ${isEdit ? "bg-gray-100 text-gray-400 cursor-not-allowed border-gray-200" : "bg-white border-gray-200 focus:border-black"
+                                                }`}
                                         />
                                     </div>
 
@@ -105,7 +106,7 @@ const TaskForm = ({mode = "add", existingData: initialData = null}) => {
                                     <div>
                                         <label
                                             className="block text-sm font-bold text-[#2A2A2A] mb-2 uppercase tracking-wide flex items-center gap-2">
-                                            <Tag size={14}/> Category
+                                            <Tag size={14} /> Category
                                         </label>
                                         <select
                                             name="category"
@@ -123,13 +124,13 @@ const TaskForm = ({mode = "add", existingData: initialData = null}) => {
                                 {/* Dynamic Action Button */}
                                 <div className="pt-4 flex items-center gap-4">
                                     <button type="submit"
-                                            disabled={loading}
-                                            className="bg-[#181818] text-white px-8 py-4 rounded-xl font-bold flex items-center gap-2 hover:bg-[#2A2A2A] transition-all shadow-lg">
-                                        {isEdit ? <Save size={20}/> : <CheckCircle2 size={20}/>}
+                                        disabled={loading}
+                                        className="bg-[#181818] text-white px-8 py-4 rounded-xl font-bold flex items-center gap-2 hover:bg-[#2A2A2A] transition-all shadow-lg">
+                                        {isEdit ? <Save size={20} /> : <CheckCircle2 size={20} />}
                                         {isEdit ? "Update Task" : "Save Task"}
                                     </button>
                                     <a href="/todo"
-                                       className="px-8 py-4 font-bold text-gray-500 hover:text-black transition-colors">Cancel</a>
+                                        className="px-8 py-4 font-bold text-gray-500 hover:text-black transition-colors">Cancel</a>
                                 </div>
                             </form>
                         </div>
@@ -139,18 +140,17 @@ const TaskForm = ({mode = "add", existingData: initialData = null}) => {
                     <div className="space-y-6">
                         <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
                             <h3 className="font-bold text-[#181818] mb-4 flex items-center gap-2 border-b pb-4"><Flag
-                                size={18}/> Task Priority</h3>
+                                size={18} /> Task Priority</h3>
                             <div className="space-y-3">
                                 {["low", "medium", "high"].map((p) => (
                                     <button
                                         key={p}
                                         type="button"
                                         onClick={() => setPriority(p)}
-                                        className={`w-full p-4 rounded-xl border-2 text-left capitalize font-bold transition-all flex items-center justify-between ${
-                                            formData.priority === p
+                                        className={`w-full p-4 rounded-xl border-2 text-left capitalize font-bold transition-all flex items-center justify-between ${formData.priority === p
                                                 ? "border-[#181818] bg-[#181818] text-white"
                                                 : "border-gray-50 bg-gray-50 text-gray-400 hover:border-gray-200"
-                                        }`}
+                                            }`}
                                     >
                                         {p} Priority
                                         {formData.priority === p && <div className="w-2 h-2 bg-white rounded-full"></div>}
