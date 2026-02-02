@@ -49,11 +49,17 @@ export const userController = {
     // ... existing register and login methods ...
 
     async updateProfile(req, res) {
+        console.log(req.body)
         try {
             const { username, email } = req.body;
-            
-            // Pass the ID from the token and the new data to the service
-            const updatedUser = await userService.updateUser(req.userId, { username, email });
+            let updateData = { username, email };
+
+            // If a file was uploaded by multer
+            if (req.file) {
+                updateData.profilePicture = `/uploads/profiles/${req.file.filename}`;
+            }
+
+            const updatedUser = await userService.updateUser(req.userId, updateData);
 
             if (!updatedUser) {
                 return res.status(404).json({ message: "User not found" });
@@ -61,10 +67,11 @@ export const userController = {
 
             res.json({
                 message: "Profile updated",
-                user: { 
-                    id: updatedUser._id, 
-                    username: updatedUser.username, 
-                    email: updatedUser.email 
+                user: {
+                    id: updatedUser._id,
+                    username: updatedUser.username,
+                    email: updatedUser.email,
+                    profilePicture: updatedUser.profilePicture
                 }
             });
         } catch (error) {

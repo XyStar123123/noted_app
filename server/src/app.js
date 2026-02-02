@@ -13,6 +13,7 @@ router.get('/', (req, res) => {
 router.use('/auth', userRoute); // Client hits /auth/register or /auth/login
 router.use('/task', taskRoute);
 router.use('/archive', archiveRoute);
+router.use('/uploads', e.static('uploads'));
 router.use('/me', authRoute);
 
 export default router;

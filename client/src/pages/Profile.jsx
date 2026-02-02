@@ -10,6 +10,8 @@ const Profile = () => {
     const { tasks, loading: tasksLoading } = useTasks();
     const { showMessage } = useFlash();
     const [formData, setFormData] = useState({ username: "", email: "" });
+    const [selectedFile, setSelectedFile] = useState(null);
+    const [previewUrl, setPreviewUrl] = useState(null);
 
     useEffect(() => {
         if (user) {
@@ -21,14 +23,29 @@ const Profile = () => {
         }
     }, [user]);
 
+    const handleFileChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            setSelectedFile(file);
+            setPreviewUrl(URL.createObjectURL(file)); // Show preview immediately
+        }
+    };
+
     // 2. DEFINE YOUR HANDLERS
     const handleSave = async (e) => {
         e.preventDefault();
-        const result = await updateProfile(formData);
+
+        // Use FormData for file uploads
+        const data = new FormData();
+        data.append("username", formData.username);
+        data.append("email", formData.email);
+        if (selectedFile) {
+            data.append("profilePicture", selectedFile);
+        }
+
+        const result = await updateProfile(data); // Update your useProfile hook to send FormData
         if (result?.success) {
             showMessage("Profile updated!", "success");
-        } else {
-            showMessage(result?.error || "Update failed", "error");
         }
     };
 
@@ -55,12 +72,22 @@ const Profile = () => {
                     <div className="lg:col-span-1 space-y-6">
                         <div className="bg-white p-8 rounded-2xl border border-gray-100 shadow-sm text-center">
                             <div className="relative w-32 h-32 mx-auto mb-4">
-                                <div className="w-full h-full bg-[#181818] rounded-full flex items-center justify-center text-white text-4xl font-bold uppercase">
-                                    {user?.username?.substring(0, 2) || "??"}
-                                </div>
-                                <button className="absolute bottom-0 right-0 p-2 bg-white border border-gray-200 rounded-full shadow-sm hover:bg-gray-50 transition-all">
+                                {/* Display Avatar: Priority = Preview > Database Image > Initials */}
+                                {previewUrl || user?.profilePicture ? (
+                                    <img
+                                        src={previewUrl || `http://localhost:5000${user.profilePicture}`}
+                                        className="w-full h-full rounded-full object-cover border-4 border-white shadow-md"
+                                    />
+                                ) : (
+                                    <div className="w-full h-full bg-[#181818] rounded-full flex items-center justify-center text-white text-4xl font-bold uppercase">
+                                        {user?.username?.substring(0, 2)}
+                                    </div>
+                                )}
+
+                                <label className="absolute bottom-0 right-0 p-2 bg-white border border-gray-200 rounded-full shadow-sm hover:bg-gray-50 transition-all cursor-pointer">
                                     <Camera size={18} />
-                                </button>
+                                    <input type="file" className="hidden" onChange={handleFileChange} accept="image/*" />
+                                </label>
                             </div>
                             <h2 className="text-xl font-bold text-[#181818]">{user?.username}</h2>
                             <p className="text-gray-400 text-sm">Joined {new Date(user?.createdAt).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}</p>
@@ -71,12 +98,12 @@ const Profile = () => {
                             <h3 className="font-bold text-gray-400 text-xs uppercase tracking-widest">Productivity</h3>
                             <div className="grid grid-cols-2 gap-4">
                                 <div className="p-4 bg-gray-50 rounded-xl">
-                                    <ListTodo className="text-blue-500 mb-2" size={20}/>
+                                    <ListTodo className="text-blue-500 mb-2" size={20} />
                                     <p className="text-2xl font-black">{totalTasks}</p>
                                     <p className="text-xs text-gray-500">Total Tasks</p>
                                 </div>
                                 <div className="p-4 bg-gray-50 rounded-xl">
-                                    <CheckCircle className="text-green-500 mb-2" size={20}/>
+                                    <CheckCircle className="text-green-500 mb-2" size={20} />
                                     <p className="text-2xl font-black">{completedTasks}</p>
                                     <p className="text-xs text-gray-500">Completed</p>
                                 </div>
@@ -106,8 +133,8 @@ const Profile = () => {
                                     </label>
                                     <input
                                         type="text"
-                                        value={formData.username || ''} 
-                                        onChange={(e) => setFormData({...formData, username: e.target.value})}
+                                        value={formData.username || ''}
+                                        onChange={(e) => setFormData({ ...formData, username: e.target.value })}
                                         className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-gray-500 cursor-not-allowed"
                                         readOnly
                                     />
@@ -119,8 +146,8 @@ const Profile = () => {
                                     </label>
                                     <input
                                         type="email"
-                                        value={formData.email || ''} 
-                                        onChange={(e) => setFormData({...formData, email: e.target.value})}
+                                        value={formData.email || ''}
+                                        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                                         className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-black outline-none transition-all"
                                     />
                                 </div>

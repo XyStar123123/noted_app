@@ -1,0 +1,21 @@
+{
+  "name": "noted",
+  "version": "1.0.0",
+  "description": "**Noted** is a sleek, minimalist productivity application built with the MERN stack. It allows users to manage tasks, track productivity metrics in real-time, and manage their personal profile through a clean, modern interface.",
+  "main": "list-file.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/XyStar123123/noted_app.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/XyStar123123/noted_app/issues"
+  },
+  "homepage": "https://github.com/XyStar123123/noted_app#readme"
+}
